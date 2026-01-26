@@ -1,0 +1,72 @@
+/* src/app/globals.css */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* 1) Base tokens (LIGHT) */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 6%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 8%;
+
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 0 0% 20%;
+
+  --radius: 16px;
+}
+
+/* 2) Dark tokens — IMPORTANT: use :root.dark (wins reliably when class is on <html>) */
+:root.dark {
+  --background: 0 0% 4%;
+  --foreground: 0 0% 96%;
+
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 96%;
+
+  --muted: 0 0% 10%;
+  --muted-foreground: 0 0% 70%;
+
+  --border: 0 0% 14%;
+  --input: 0 0% 14%;
+  --ring: 0 0% 60%;
+}
+
+/* 3) Map tokens into Tailwind v4 theme colors */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius: var(--radius);
+}
+
+/* 4) Global base styles */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+/* 5) Hard proof (remove later): if dark works, page background MUST be dark */
+html.dark body {
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
