@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+**Vouch**
 
-## Getting Started
+Vouch is a referral-matching platform that connects job seekers with professionals willing to refer them. It introduces structured profiles, interest-based matching, and controlled request workflows to make referrals more transparent and scalable.
 
-First, run the development server:
+**Overview**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Referrals are often informal and opaque. Vouch creates a structured system that:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Enables candidates to build professional profiles
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Allows referrers to evaluate applicants efficiently
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Supports mutual-interest interaction logic
 
-## Learn More
+Tracks request lifecycle and engagement state
 
-To learn more about Next.js, take a look at the following resources:
+Provides a foundation for future ranking and reputation algorithms
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Tech Stack**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Frontend
 
-## Deploy on Vercel
+Next.js (App Router)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+TypeScript
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+React
+
+Tailwind CSS
+
+Shadcn UI
+
+Backend / Infrastructure
+
+Supabase (PostgreSQL, Auth, API)
+
+Vercel (Deployment & Hosting)
+
+**Architecture**
+src/
+  app/
+  components/
+  features/
+  hooks/
+  lib/
+
+
+The application follows a modular structure designed for scalability and future backend expansion.
+
+**Roadmap**
+
+Reputation scoring system
+
+Request prioritization algorithm
+
+Backend-controlled request limits
+
+Advanced filtering and search
