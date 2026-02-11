@@ -1,0 +1,537 @@
+@import "tailwindcss";
+
+/* Tailwind v4 content scanning */
+@source "../**/*.{js,ts,jsx,tsx}";
+
+@font-face {
+  font-family: 'Kola';
+  src: url('/fonts/kola/kola.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  font-style: normal;
+}
+
+
+/* ---------- Design Tokens ---------- */
+:root {
+  /* Core palette - Uber-like restraint */
+  --bg: 18 18 18;
+  /* Near-black */
+  --fg: 255 255 255;
+  /* High contrast white */
+
+  /* Navigation */
+  --nav-bg: 255 255 255;
+  /* Pure white */
+  --nav-fg: 0 0 0;
+  /* Pure black */
+
+  /* Muted text levels */
+  --muted: 160 160 160;
+  --muted-soft: 120 120 120;
+
+  /* Card surfaces */
+  --surface-main: 24 24 24;
+  --surface-elevated: 32 32 32;
+  --surface-border: 255 255 255;
+  /* Kept for subtle usage, but relying on shadow */
+
+  /* Accent - High Contrast (Violet) */
+  --accent-indigo: 139 92 246;
+  /* Kept for utility classes */
+  --accent-teal: 20 184 166;
+  /* Kept for utility classes */
+
+  /* NOTE: --accent is now defined in candidate.css and referrer.css based on data-theme */
+
+  --accent-inverse: 255 255 255;
+
+  /* Semantic */
+  --success: 34 197 94;
+
+  /* Shadows - Depth over lines */
+  --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 24px 60px rgba(0, 0, 0, 0.6);
+
+  /* Radii */
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-full: 9999px;
+
+  /* Fonts */
+  --font-brand: 'Kola', system-ui, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.2, 0, 0, 1);
+  --transition-base: 300ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@utility font-brand {
+  font-family: var(--font-brand);
+}
+
+/* ---------- Role-Based Accent System ---------- */
+/* Candidate theme uses indigo accent */
+html[data-role="candidate"] {
+  --accent: 139 92 246;
+  /* Indigo-500 for main accent */
+  --accent-weak: rgba(139, 92, 246, 0.15);
+  /* Low opacity for tints/borders */
+  --accent-hover: 167 139 250;
+  /* Indigo-400 - brighter for hover */
+  --accent-glow: rgba(139, 92, 246, 0.4);
+  /* Glow/shadow effect */
+  --ring: rgba(139, 92, 246, 0.5);
+  /* Focus ring */
+}
+
+/* Referrer theme uses teal accent */
+html[data-role="referrer"] {
+  --accent: 20 184 166;
+  /* Teal-500 for main accent */
+  --accent-weak: rgba(20, 184, 166, 0.15);
+  /* Low opacity for tints/borders */
+  --accent-hover: 45 212 191;
+  /* Teal-400 - brighter for hover */
+  --accent-glow: rgba(20, 184, 166, 0.4);
+  /* Glow/shadow effect */
+  --ring: rgba(20, 184, 166, 0.5);
+  /* Focus ring */
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: #121212;
+  /* Default Gradient (Matches Candidate) - Override in theme CSS files */
+  background-image: radial-gradient(circle at 50% 0%,
+      rgba(99, 102, 241, 0.15) 0%,
+      transparent 50%);
+  background-attachment: fixed;
+  color: rgb(var(--fg));
+  font-family: var(--font-outfit), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-image 0.5s ease;
+}
+
+/* Theme-aware Utilities */
+.border-accent-subtle {
+  border-color: var(--accent-weak);
+}
+
+.shadow-glow {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(var(--accent), 0.3);
+}
+
+/* ---------- Swipe Animation Keyframes ---------- */
+@keyframes swipe-right {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(150%) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipe-left {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(-150%) rotate(-20deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipe-up {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(-150%) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@keyframes card-enter {
+  0% {
+    transform: scale(0.95) translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes stamp-in {
+  0% {
+    transform: scale(2) rotate(-15deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.1) rotate(-12deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(-12deg);
+    opacity: 1;
+  }
+}
+
+.animate-swipe-right {
+  animation: swipe-right 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-swipe-left {
+  animation: swipe-left 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-swipe-up {
+  animation: swipe-up 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-card-enter {
+  animation: card-enter 350ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-stamp-in {
+  animation: stamp-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Modal Animations */
+@keyframes modal-overlay-in {
+  0% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+
+  100% {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes modal-card-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(8px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-overlay {
+  animation: modal-overlay-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.animate-modal-card {
+  animation: modal-card-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1) 50ms forwards;
+}
+
+@keyframes fade-in-out {
+  0% {
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  65% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes logo-scale {
+  0% {
+    transform: scale(1.10);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes logo-scale {
+    0% {
+      transform: scale(1);
+      opacity: 0;
+    }
+
+    35% {
+      opacity: 1;
+    }
+
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+}
+
+/* Swipe indicator stamps */
+.swipe-stamp {
+  position: absolute;
+  top: 40px;
+  padding: 8px 24px;
+  border-radius: 8px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 4px solid;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.swipe-stamp.match {
+  right: 30px;
+  color: rgb(var(--accent));
+  border-color: rgb(var(--accent));
+  transform: rotate(-12deg);
+}
+
+.swipe-stamp.pass {
+  left: 30px;
+  color: rgb(var(--muted));
+  border-color: rgb(var(--muted));
+  transform: rotate(12deg);
+}
+
+.swipe-stamp.super {
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
+  color: rgb(var(--success));
+  border-color: rgb(var(--success));
+}
+
+/* ---------- Premium Button Interactions ---------- */
+
+/* Base button styles */
+.btn-base {
+  transition: all 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  outline: none;
+}
+
+/* Primary Button - Filled accent background */
+.btn-primary {
+  background: rgb(var(--accent));
+  color: white;
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.btn-primary:hover {
+  background: rgb(var(--accent-hover));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+
+.btn-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.btn-primary:focus-visible {
+  background: rgb(var(--accent-hover));
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px var(--ring), 0 6px 20px var(--accent-glow);
+}
+
+/* Secondary Button - Ghost/Outline style */
+.btn-secondary {
+  background: var(--accent-weak);
+  color: rgb(var(--accent));
+  border: 2px solid rgba(var(--accent), 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:hover {
+  background: rgba(var(--accent-hover), 0.2);
+  border-color: rgb(var(--accent-hover));
+  color: rgb(var(--accent-hover));
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary:focus-visible {
+  background: rgba(var(--accent-hover), 0.2);
+  border-color: rgb(var(--accent-hover));
+  color: rgb(var(--accent-hover));
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px var(--ring), 0 4px 16px var(--accent-glow);
+}
+
+/* Neutral Button - Muted style */
+.btn-neutral {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-neutral:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-neutral:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-neutral:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3), 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- Navigation Items ---------- */
+.nav-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color 150ms cubic-bezier(0.2, 0.8, 0.2, 1), transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  /* Standardized sizing per user request */
+  height: 40px;
+  padding: 0 16px;
+  cursor: pointer;
+  /* Ensure typography is consistent (can be overridden but defaults here) */
+  font-size: 0.875rem;
+  /* text-sm */
+  letter-spacing: 0.01em;
+}
+
+/* Underline pseudo-element */
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  /* snug against bottom padding */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: rgb(var(--accent));
+  border-radius: 99px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 150ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 150ms ease, opacity 150ms ease;
+  opacity: 0;
+}
+
+/* Hover State */
+.nav-item:hover {
+  color: rgb(var(--accent));
+  transform: translateY(-1px);
+}
+
+.nav-item:hover::after {
+  background-color: rgb(var(--accent));
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Active State */
+.nav-item.active {
+  color: rgb(var(--accent));
+  font-weight: 600;
+}
+
+.nav-item.active::after {
+  background-color: rgb(var(--accent));
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+/* Hovering active item */
+.nav-item.active:hover {
+  color: rgb(var(--accent-hover));
+}
+
+.nav-item.active:hover::after {
+  background-color: rgb(var(--accent-hover));
+}
+
+/* Focus Visible */
+.nav-item:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+
+  .btn-primary:hover,
+  .btn-primary:focus-visible,
+  .btn-secondary:hover,
+  .btn-secondary:focus-visible,
+  .btn-neutral:hover,
+  .btn-neutral:focus-visible,
+  .nav-item:hover,
+  .nav-item:focus-visible {
+    transform: none;
+  }
+
+  /* Don't animate width/scale */
+  .nav-item::after,
+  .nav-item:hover::after,
+  .nav-item.active::after {
+    transition: none;
+  }
+
+  .btn-primary:active,
+  .btn-secondary:active,
+  .btn-neutral:active {
+    transform: none;
+  }
+}

@@ -1,0 +1,18 @@
+/* Referrer Theme (Teal) */
+/* Uses html selector for consistency with globals.css */
+html[data-role="referrer"] body,
+body[data-theme="referrer"] {
+    --accent: 20 184 166;
+    /* Teal-500 */
+    --accent-weak: rgba(20, 184, 166, 0.2);
+    --accent-hover: 45 212 191;
+    /* Teal-400 - brighter for hover */
+    --accent-glow: rgba(20, 184, 166, 0.15);
+    --accent-aura: rgba(20, 184, 166, 0.4);
+    --ring: rgba(20, 184, 166, 0.5);
+
+    /* Background specific to Referrer (Teal Glow) */
+    background-image: radial-gradient(circle at 50% 0%,
+            rgba(20, 184, 166, 0.15) 0%,
+            transparent 50%);
+}

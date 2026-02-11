@@ -1,0 +1,18 @@
+/* Candidate Theme (Indigo) */
+/* Uses html selector for consistency with globals.css */
+html[data-role="candidate"] body,
+body[data-theme="candidate"] {
+    --accent: 139 92 246;
+    /* Indigo-500 */
+    --accent-weak: rgba(139, 92, 246, 0.2);
+    --accent-hover: 167 139 250;
+    /* Indigo-400 - brighter for hover */
+    --accent-glow: rgba(99, 102, 241, 0.15);
+    --accent-aura: rgba(99, 102, 241, 0.4);
+    --ring: rgba(139, 92, 246, 0.5);
+
+    /* Background specific to Candidate (Indigo Glow) */
+    background-image: radial-gradient(circle at 50% 0%,
+            rgba(99, 102, 241, 0.15) 0%,
+            transparent 50%);
+}

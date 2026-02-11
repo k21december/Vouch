@@ -1,18 +1,30 @@
-import { cn } from "@/lib/utils/cn";
+import type { ReactNode } from "react";
 
-export default function Surface({
-  className,
-  children,
-}: {
+interface SurfaceProps {
+  children: ReactNode;
   className?: string;
-  children: React.ReactNode;
-}) {
+}
+
+export default function Surface({ children, className = "" }: SurfaceProps) {
   return (
     <div
-      className={cn(
-        "rounded-3xl border border-border/40 bg-card/70 shadow-sm backdrop-blur supports-backdrop-filter:bg-card/50",
-        className
-      )}
+      className={`h-full w-full rounded-[var(--radius-lg)] p-8 ${className}`}
+      style={{
+        background: `
+          linear-gradient(
+            165deg,
+            rgb(28 28 30 / 0.95) 0%,
+            rgb(18 18 20 / 0.98) 100%
+          )
+        `,
+        boxShadow: `
+          0 10px 40px -10px rgba(0,0,0,0.5),
+          0 0 0 1px rgba(255,255,255,0.03) inset,
+          0 1px 0 0 var(--accent-aura) inset
+        `,
+        // Removing external border, relying on inner light and shadow for separation
+        backdropFilter: "blur(12px)",
+      }}
     >
       {children}
     </div>
