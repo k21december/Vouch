@@ -1,77 +1,209 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { VouchWordmark } from "@/components/ui/VouchWordmark";
+import { Mail, Lock, Eye, EyeOff, Zap, Target, ArrowRight, AlertCircle } from "lucide-react";
 
+const inputClasses =
+    "w-full pl-10 pr-3.5 py-3 rounded-xl bg-white/[0.04] border border-white/[0.08] text-white text-[15px] outline-none transition-all duration-200 placeholder:text-white/25 focus:border-[var(--button)]/30 focus:bg-white/[0.06] focus:ring-1 focus:ring-[var(--button)]/20";
 
 export default function LoginPage() {
     const router = useRouter();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPw, setShowPw] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        // Redirect if already logged in
-        const auth = localStorage.getItem("vouch.auth");
-        if (auth === "true") {
-            router.replace("/");
+    async function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        setError(null);
+        setLoading(true);
+
+        const supabase = createClient();
+        const { error: authErr } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (authErr) {
+            setError(authErr.message);
+            setLoading(false);
+            return;
         }
-    }, [router]);
 
-    const handleLogin = () => {
-        localStorage.setItem("vouch.auth", "true");
-        router.push("/");
-    };
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+            router.push("/onboarding");
+            return;
+        }
+
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
+
+        if (!profile?.role) {
+            router.push("/onboarding");
+        } else if (profile.role === "candidate") {
+            router.push("/candidate");
+        } else {
+            router.push("/referrer");
+        }
+
+        router.refresh();
+    }
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">
-            {/* Background Atmosphere */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--accent-subtle),_transparent_70%)] opacity-20" />
+        <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+            {/* Animated gradient orbs — uses theme accent glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] pointer-events-none">
+                <div
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] rounded-full blur-[120px] animate-pulse"
+                    style={{ background: "var(--accent-aura)" }}
+                />
+                <div
+                    className="absolute bottom-10 left-10 w-[250px] h-[250px] rounded-full blur-[100px] animate-pulse [animation-delay:1s]"
+                    style={{ background: "var(--accent-glow)" }}
+                />
+            </div>
 
-            <div className="z-10 flex flex-col items-center gap-12 w-full max-w-sm">
-                {/* Logo */}
-                <div className="flex flex-col items-center gap-2">
-                    <VouchWordmark size="2xl" className="text-white scale-125" />
+            <div className="w-full max-w-[420px] relative z-10">
+                {/* Glass card */}
+                <div className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-xl shadow-[0_0_0_1px_rgba(255,255,255,0.03)] overflow-hidden">
+                    {/* Top glow */}
+                    <div
+                        className="absolute top-0 left-1/2 -translate-x-1/2 w-[250px] h-[1px] pointer-events-none"
+                        style={{ background: `linear-gradient(90deg, transparent, var(--accent-aura), transparent)` }}
+                    />
 
-                    <p className="text-lg text-white/50">Professional validation.</p>
+                    <div className="p-8 pb-6">
+                        {/* Logo */}
+                        <div className="flex justify-center mb-6">
+                            <div
+                                className="w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg"
+                                style={{ background: "var(--button)", boxShadow: "0 8px 24px var(--accent-glow)" }}
+                            >
+                                <VouchWordmark size="sm" className="text-white" style={{ fontSize: 16, letterSpacing: "-0.05em" }} />
+                            </div>
+                        </div>
+
+                        {/* Header */}
+                        <h1 className="text-[26px] font-bold text-white text-center tracking-tight mb-1">
+                            Welcome back
+                        </h1>
+                        <p className="text-white/35 text-center text-sm mb-7">
+                            Sign in to continue to Vouch
+                        </p>
+
+                        {/* Error alert */}
+                        {error && (
+                            <div className="flex items-start gap-2.5 px-4 py-3 rounded-xl bg-red-500/8 border border-red-500/15 text-red-400 text-sm mb-5">
+                                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        {/* Form */}
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                            {/* Email */}
+                            <div className="relative">
+                                <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                                <input
+                                    type="email"
+                                    placeholder="Email address"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    className={inputClasses}
+                                />
+                            </div>
+
+                            {/* Password */}
+                            <div className="relative">
+                                <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/25 pointer-events-none" />
+                                <input
+                                    type={showPw ? "text" : "password"}
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    minLength={6}
+                                    className={inputClasses + " pr-10"}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPw(!showPw)}
+                                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/25 hover:text-white/50 transition-colors"
+                                    tabIndex={-1}
+                                >
+                                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+
+                            {/* Submit */}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`
+                                    w-full py-3 rounded-xl font-semibold text-[15px] text-white
+                                    transition-all duration-200 outline-none flex items-center justify-center gap-2
+                                    hover:-translate-y-0.5
+                                    active:translate-y-0 active:scale-[0.98]
+                                    ${loading ? "opacity-60 cursor-not-allowed" : ""}
+                                `}
+                                style={{
+                                    background: "var(--button)",
+                                    boxShadow: "0 4px 16px var(--accent-glow)",
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "var(--button-hover)"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "var(--button)"; }}
+                            >
+                                {loading ? (
+                                    <>
+                                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                        Signing in…
+                                    </>
+                                ) : (
+                                    <>
+                                        Sign In
+                                        <ArrowRight size={16} />
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="h-px bg-white/[0.04]" />
+
+                    {/* Footer */}
+                    <div className="px-8 py-4 bg-white/[0.01]">
+                        <p className="text-white/30 text-center text-sm">
+                            No account?{" "}
+                            <a
+                                href="/signup"
+                                className="no-underline transition-colors font-medium"
+                                style={{ color: "rgb(var(--accent-hover))" }}
+                            >
+                                Create one →
+                            </a>
+                        </p>
+                    </div>
                 </div>
 
-                {/* Buttons */}
-                <div className="flex flex-col w-full gap-4">
-                    <button
-                        onClick={handleLogin}
-                        className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-white/5 p-4 text-base font-bold text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="opacity-70">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                        </svg>
-                        Continue with Google
-                    </button>
-
-                    <button
-                        onClick={handleLogin}
-                        className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-white/5 p-4 text-base font-bold text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                        <svg width="20" height="20" viewBox="0 0 23 23" fill="currentColor" className="opacity-70">
-                            <path fill="#f3f3f3" d="M0 0h23v23H0z" />
-                            <path fill="#f35325" d="M1 1h10v10H1z" />
-                            <path fill="#81bc06" d="M12 1h10v10H12z" />
-                            <path fill="#05a6f0" d="M1 12h10v10H1z" />
-                            <path fill="#ffba08" d="M12 12h10v10H12z" />
-                        </svg>
-                        Continue with Microsoft
-                    </button>
-
-                    <button
-                        onClick={handleLogin}
-                        className="group relative flex w-full items-center justify-center gap-3 rounded-2xl bg-white/5 p-4 text-base font-bold text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-70">
-                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                        </svg>
-                        Continue with Phone
-                    </button>
+                {/* Feature bullets */}
+                <div className="mt-8 flex flex-col items-center gap-3">
+                    {[
+                        { icon: <Zap size={13} />, text: "Direct intros, not job boards" },
+                        { icon: <Target size={13} />, text: "Matched by role-fit + acceptance odds" },
+                        { icon: <ArrowRight size={13} />, text: "Fast onboarding in under 2 minutes" },
+                    ].map((b) => (
+                        <div key={b.text} className="flex items-center gap-2.5 text-white/20 text-xs">
+                            <span style={{ color: "var(--accent-weak)" }}>{b.icon}</span>
+                            <span>{b.text}</span>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

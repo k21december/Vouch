@@ -1,18 +1,18 @@
 "use client";
 
-import { Role } from "@/lib/auth/role";
+import { Theme } from "@/lib/auth/role";
 import { VouchWordmark } from "@/components/ui/VouchWordmark";
 
 
 interface SplashOverlayProps {
     open: boolean;
-    theme: Role;
+    theme: Theme;
 }
 
 export default function SplashOverlay({ open, theme }: SplashOverlayProps) {
     if (!open) return null;
 
-    const accentVar = theme === "referrer" ? "--accent-teal" : "--accent-indigo";
+    const accentVar = theme === "referrer" ? "--accent-teal" : theme === "navy" ? "--accent-indigo" : "--accent-indigo";
 
     return (
         <div className="fixed inset-0 z-[100] pointer-events-none flex items-center justify-center">

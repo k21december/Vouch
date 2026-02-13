@@ -1,5 +1,7 @@
 export type Role = "candidate" | "referrer";
 
+export type Theme = Role | "navy";
+
 export type Permission =
   | "view_discover"
   | "view_matches"
@@ -10,6 +12,7 @@ export type Permission =
   | "view_settings";
 
 export const DEFAULT_ROLE: Role = "candidate";
+export const DEFAULT_THEME: Theme = "navy";
 
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   candidate: [

@@ -14,17 +14,24 @@
 
 /* ---------- Design Tokens ---------- */
 :root {
-  /* Core palette - Uber-like restraint */
-  --bg: 18 18 18;
-  /* Near-black */
+  /* Core palette */
   --fg: 255 255 255;
-  /* High contrast white */
+
+  /* Navy defaults (logged-out) */
+  --bg: #0b1220;
+  --card: #111827;
+  --accent: 30 58 138;
+  --accent-weak: rgba(30, 58, 138, 0.15);
+  --accent-hover: 59 130 246;
+  --accent-glow: rgba(29, 78, 216, 0.15);
+  --accent-aura: rgba(29, 78, 216, 0.4);
+  --ring: rgba(29, 78, 216, 0.5);
+  --button: #1d4ed8;
+  --button-hover: #2563eb;
 
   /* Navigation */
   --nav-bg: 255 255 255;
-  /* Pure white */
   --nav-fg: 0 0 0;
-  /* Pure black */
 
   /* Muted text levels */
   --muted: 160 160 160;
@@ -34,22 +41,16 @@
   --surface-main: 24 24 24;
   --surface-elevated: 32 32 32;
   --surface-border: 255 255 255;
-  /* Kept for subtle usage, but relying on shadow */
 
-  /* Accent - High Contrast (Violet) */
+  /* Static palette refs */
   --accent-indigo: 139 92 246;
-  /* Kept for utility classes */
   --accent-teal: 20 184 166;
-  /* Kept for utility classes */
-
-  /* NOTE: --accent is now defined in candidate.css and referrer.css based on data-theme */
-
   --accent-inverse: 255 255 255;
 
   /* Semantic */
   --success: 34 197 94;
 
-  /* Shadows - Depth over lines */
+  /* Shadows */
   --shadow-soft: 0 12px 40px rgba(0, 0, 0, 0.4);
   --shadow-float: 0 24px 60px rgba(0, 0, 0, 0.6);
 
@@ -70,33 +71,51 @@
   font-family: var(--font-brand);
 }
 
-/* ---------- Role-Based Accent System ---------- */
-/* Candidate theme uses indigo accent */
-html[data-role="candidate"] {
-  --accent: 139 92 246;
-  /* Indigo-500 for main accent */
-  --accent-weak: rgba(139, 92, 246, 0.15);
-  /* Low opacity for tints/borders */
-  --accent-hover: 167 139 250;
-  /* Indigo-400 - brighter for hover */
-  --accent-glow: rgba(139, 92, 246, 0.4);
-  /* Glow/shadow effect */
-  --ring: rgba(139, 92, 246, 0.5);
-  /* Focus ring */
+/* ---------- Role-Based Theme System ---------- */
+
+/* Navy theme (logged-out default) */
+html[data-theme="navy"],
+html[data-role="navy"] {
+  --bg: #0b1220;
+  --card: #111827;
+  --accent: 30 58 138;
+  --accent-weak: rgba(30, 58, 138, 0.15);
+  --accent-hover: 59 130 246;
+  --accent-glow: rgba(29, 78, 216, 0.15);
+  --accent-aura: rgba(29, 78, 216, 0.4);
+  --ring: rgba(29, 78, 216, 0.5);
+  --button: #1d4ed8;
+  --button-hover: #2563eb;
 }
 
-/* Referrer theme uses teal accent */
+/* Candidate theme (indigo) */
+html[data-theme="candidate"],
+html[data-role="candidate"] {
+  --bg: #0f1020;
+  --card: #14162a;
+  --accent: 139 92 246;
+  --accent-weak: rgba(139, 92, 246, 0.15);
+  --accent-hover: 167 139 250;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+  --accent-aura: rgba(99, 102, 241, 0.4);
+  --ring: rgba(139, 92, 246, 0.5);
+  --button: #6366f1;
+  --button-hover: #818cf8;
+}
+
+/* Referrer theme (teal) */
+html[data-theme="referrer"],
 html[data-role="referrer"] {
+  --bg: #071a18;
+  --card: #0d2623;
   --accent: 20 184 166;
-  /* Teal-500 for main accent */
   --accent-weak: rgba(20, 184, 166, 0.15);
-  /* Low opacity for tints/borders */
   --accent-hover: 45 212 191;
-  /* Teal-400 - brighter for hover */
-  --accent-glow: rgba(20, 184, 166, 0.4);
-  /* Glow/shadow effect */
+  --accent-glow: rgba(20, 184, 166, 0.15);
+  --accent-aura: rgba(20, 184, 166, 0.4);
   --ring: rgba(20, 184, 166, 0.5);
-  /* Focus ring */
+  --button: #14b8a6;
+  --button-hover: #2dd4bf;
 }
 
 html,
@@ -105,17 +124,10 @@ body {
 }
 
 body {
-  background: #121212;
-  /* Default Gradient (Matches Candidate) - Override in theme CSS files */
-  background-image: radial-gradient(circle at 50% 0%,
-      rgba(99, 102, 241, 0.15) 0%,
-      transparent 50%);
-  background-attachment: fixed;
   color: rgb(var(--fg));
   font-family: var(--font-outfit), sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-image 0.5s ease;
 }
 
 /* Theme-aware Utilities */
@@ -133,6 +145,25 @@ body {
 
 ::selection {
   background: rgba(var(--accent), 0.3);
+}
+
+/* ---------- Background Ambient Pulse ---------- */
+@keyframes bg-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translateX(-50%) scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+.animate-bg-pulse {
+  animation: bg-pulse 8s ease-in-out infinite;
 }
 
 /* ---------- Swipe Animation Keyframes ---------- */

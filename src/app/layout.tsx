@@ -5,7 +5,7 @@ import { Outfit, Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/lib/auth/ThemeProvider";
 import DevToolbar from "@/components/debug/DevToolbar";
 import AppShell from "@/components/layout/AppShell";
-import ThemeManager from "@/components/layout/ThemeManager";
+import AppBackground from "@/components/layout/AppBackground";
 import PageTransition from "@/components/layout/PageTransition";
 import SplashWrapper from "@/components/layout/SplashWrapper";
 
@@ -28,17 +28,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" data-theme="navy">
       <body className={`${outfit.variable} ${spaceGrotesk.variable} antialiased`} suppressHydrationWarning>
         <ThemeProvider>
-          <AppShell>
-            <ThemeManager /> {/* Handles dynamic body classes based on role */}
-            <SplashWrapper /> {/* Handles splash overlay for theme transitions */}
-            <PageTransition>
-              {children}
-            </PageTransition>
-          </AppShell>
-          <DevToolbar />
+          <AppBackground>
+            <AppShell>
+              <SplashWrapper />
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </AppShell>
+            <DevToolbar />
+          </AppBackground>
         </ThemeProvider>
       </body>
     </html>

@@ -1,18 +1,32 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { DEFAULT_ROLE, Role, Permission, hasPermission } from "./role";
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
+import { usePathname } from "next/navigation";
+import {
+    DEFAULT_ROLE,
+    Role,
+    Theme,
+    Permission,
+    hasPermission,
+} from "./role";
 import { supabase } from "@/lib/supabase/client";
 
-const KEY = "refer.role";
+const AUTH_ROUTES = ["/login", "/signup", "/onboarding"];
 
 interface SplashState {
     open: boolean;
-    theme: Role;
+    theme: Theme;
 }
 
 interface ThemeContextValue {
     role: Role;
+    theme: Theme;
     setRole: (role: Role) => void;
     switchRoleWithSplash: (nextRole: Role) => void;
     can: (perm: Permission) => boolean;
@@ -21,44 +35,75 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+function getStoredSession() {
+    if (typeof window === "undefined") return null;
+    try {
+        const raw = localStorage.getItem("vouch.session");
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+}
+
+function setStoredSession(session: { userId: string; role: Role } | null) {
+    if (typeof window === "undefined") return;
+    if (!session) localStorage.removeItem("vouch.session");
+    else localStorage.setItem("vouch.session", JSON.stringify(session));
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [role, setRoleState] = useState<Role>(() => {
-        // Initialize from localStorage before first paint (Optimistic / Cache)
-        if (typeof window !== "undefined") {
-            try {
-                // Check legacy session first
-                const sessionStr = localStorage.getItem("vouch.session");
-                if (sessionStr) {
-                    const session = JSON.parse(sessionStr);
-                    if (session.role) return session.role;
-                }
-                const saved = localStorage.getItem(KEY) as Role;
-                if (saved) return saved;
-            } catch (e) { }
-        }
-        return DEFAULT_ROLE;
-    });
+    const pathname = usePathname();
+    const isAuthRoute = AUTH_ROUTES.some((route) =>
+        pathname?.startsWith(route)
+    );
+
+    const [authenticated, setAuthenticated] = useState(false);
+    const [role, setRoleState] = useState<Role>(DEFAULT_ROLE);
 
     const [splashState, setSplashState] = useState<SplashState>({
         open: false,
-        theme: role,
+        theme: "navy",
     });
 
-    // Apply theme to DOM
-    useEffect(() => {
-        document.documentElement.dataset.theme = role;
-        document.body.dataset.theme = role;
-    }, [role]);
+    /**
+     * THEME LOGIC (Single Source of Truth)
+     */
+    const theme: Theme = useMemo(() => {
+        if (isAuthRoute) return "navy";
+        if (!authenticated) return "navy";
+        return role;
+    }, [authenticated, role, isAuthRoute]);
 
-    // Sync with Supabase (Source of Truth)
+    /**
+     * Apply theme to DOM
+     */
+    useEffect(() => {
+        document.documentElement.dataset.theme = theme;
+        document.body.dataset.theme = theme;
+    }, [theme]);
+
+    /**
+     * Supabase Auth Sync
+     */
     useEffect(() => {
         if (!supabase) return;
         let mounted = true;
-        async function syncRole() {
-            const { data: { user } } = await supabase!.auth.getUser();
-            if (!user) return;
 
-            const { data } = await supabase!
+        async function syncAuth() {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                if (mounted) {
+                    setAuthenticated(false);
+                    setRoleState(DEFAULT_ROLE);
+                    setStoredSession(null);
+                }
+                return;
+            }
+
+            if (mounted) setAuthenticated(true);
+
+            const { data } = await supabase
                 .from("profiles")
                 .select("role")
                 .eq("id", user.id)
@@ -66,45 +111,58 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
             if (mounted && data?.role) {
                 const dbRole = data.role as Role;
-                if (dbRole !== role) {
-                    setRoleState(dbRole);
-                    localStorage.setItem(KEY, dbRole);
-                }
+                setRoleState(dbRole);
+                setStoredSession({ userId: user.id, role: dbRole });
             }
         }
-        syncRole();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                syncRole();
-            }
-            if (event === 'SIGNED_OUT') {
-                setRoleState(DEFAULT_ROLE);
-            }
-        });
+        syncAuth();
+
+        const { data: { subscription } } =
+            supabase.auth.onAuthStateChange((event) => {
+                if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+                    syncAuth();
+                }
+
+                if (event === "SIGNED_OUT") {
+                    if (mounted) {
+                        setAuthenticated(false);
+                        setRoleState(DEFAULT_ROLE);
+                        setStoredSession(null);
+                    }
+                }
+            });
 
         return () => {
             mounted = false;
             subscription.unsubscribe();
         };
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    }, []);
 
+    /**
+     * Switch role (only when authenticated)
+     */
     const setRole = async (next: Role) => {
+        if (!authenticated) return;
+
         setRoleState(next);
-        localStorage.setItem(KEY, next);
 
         if (supabase) {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
-                await supabase.from("profiles").update({ role: next }).eq("id", user.id);
+                await supabase
+                    .from("profiles")
+                    .update({ role: next })
+                    .eq("id", user.id);
+
+                setStoredSession({ userId: user.id, role: next });
             }
-            localStorage.setItem("vouch.session", JSON.stringify({ userId: user?.id, role: next }));
-        } else {
-            localStorage.setItem("vouch.session", JSON.stringify({ userId: "referrer_1", role: next }));
         }
     };
 
     const switchRoleWithSplash = (nextRole: Role) => {
+        if (!authenticated) return;
+
         setSplashState({ open: true, theme: nextRole });
         setTimeout(() => setRole(nextRole), 100);
         setTimeout(() => setSplashState({ open: false, theme: nextRole }), 500);
@@ -117,13 +175,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     const value: ThemeContextValue = {
         role,
+        theme,
         setRole,
         switchRoleWithSplash,
         can,
         splashState,
     };
 
-    return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+    return (
+        <ThemeContext.Provider value={value}>
+            {children}
+        </ThemeContext.Provider>
+    );
 }
 
 export function useTheme() {

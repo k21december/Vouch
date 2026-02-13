@@ -13,7 +13,7 @@ function HomeView() {
 
   if (role === "referrer") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[radial-gradient(ellipse_at_top,_var(--accent-subtle),_transparent_60%)] relative">
+      <div className="flex min-h-screen flex-col items-center justify-center p-6 relative">
         {/* Top Right Settings */}
         <div className="absolute top-6 right-6">
           <Link href="/settings">
@@ -87,7 +87,7 @@ function HomeView() {
 
   // Default / Candidate View
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-6 bg-[radial-gradient(ellipse_at_top,_var(--accent-subtle),_transparent_60%)]">
+    <div className="flex min-h-screen flex-col items-center justify-center p-6">
       <div className="w-full max-w-md flex flex-col gap-8">
         {/* Welcome Header */}
         <div className="text-center space-y-2">
