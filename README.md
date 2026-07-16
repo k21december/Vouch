@@ -1,58 +1,44 @@
-**Vouch**
+# Vouch
 
-Vouch is a referral-matching platform that connects job seekers with professionals willing to refer them. It introduces structured profiles, interest-based matching, and controlled request workflows to make referrals more transparent and scalable.
+Vouch is a referral-matching platform that connects job seekers with professionals willing to refer them. It introduces structured profiles, swipe-based matching, and controlled request workflows to make referrals more transparent and scalable. Vouch reached 200+ users during early testing.
 
-**Overview**
+## Overview
 
 Referrals are often informal and opaque. Vouch creates a structured system that:
 
-Enables candidates to build professional profiles
+- Enables candidates to build professional profiles
+- Allows referrers to evaluate applicants efficiently
+- Supports swipe-based, mutual-interest matching logic
+- Tracks request lifecycle and engagement state
+- Provides a foundation for future ranking and reputation algorithms
 
-Allows referrers to evaluate applicants efficiently
+## Tech Stack
 
-Supports mutual-interest interaction logic
+**Frontend**
+- Next.js (App Router)
+- TypeScript
+- React
+- Tailwind CSS
+- Shadcn UI
 
-Tracks request lifecycle and engagement state
+**Backend / Infrastructure**
+- Supabase (PostgreSQL, Auth, API)
+- Vercel (Deployment & Hosting)
 
-Provides a foundation for future ranking and reputation algorithms
+## Architecture
 
-**Tech Stack**
-
-Frontend
-
-Next.js (App Router)
-
-TypeScript
-
-React
-
-Tailwind CSS
-
-Shadcn UI
-
-Backend / Infrastructure
-
-Supabase (PostgreSQL, Auth, API)
-
-Vercel (Deployment & Hosting)
-
-**Architecture**
-src/
-  app/
-  components/
-  features/
-  hooks/
-  lib/
-
+    src/
+      app/
+      components/
+      features/
+      hooks/
+      lib/
 
 The application follows a modular structure designed for scalability and future backend expansion.
 
-**Roadmap**
+## Roadmap
 
-Reputation scoring system
-
-Request prioritization algorithm
-
-Backend-controlled request limits
-
-Advanced filtering and search
+- Reputation scoring system
+- Request prioritization algorithm
+- Backend-controlled request limits
+- Advanced filtering and search
